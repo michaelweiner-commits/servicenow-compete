@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Federal Deployment Gap — ServiceNow vs. Salesforce ITSM (Federal Civilian)</title>
+<style>
+  :root{
+    --cloud-tint:#EAF5FE;--cloud-2:#D8EEFC;--cloud:#00B3FF;--electric:#066AFE;--electric-deep:#022AC0;
+    --navy:#001E5B;--ink:#032D60;--body:#16325C;--muted:#5A7184;--card:#FFFFFF;--line:#CFE4F7;
+    --accent-teal:#04E1CB;--accent-warn:#FE9339;--accent-red:#EA001E;
+    --shadow:0 10px 30px rgba(6,106,254,.12);--shadow-lg:0 24px 60px rgba(2,42,192,.22);
+    --sans:"Salesforce Sans","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--cloud-tint);color:var(--body);-webkit-font-smoothing:antialiased;line-height:1.5}
+
+  /* internal-use banner */
+  .ibanner{position:sticky;top:0;z-index:60;background:var(--accent-warn);color:#3d2200;
+    font-size:.82rem;font-weight:700;letter-spacing:.04em;text-align:center;padding:.5rem 1rem;
+    text-transform:uppercase}
+  /* progress bar */
+  .top{position:fixed;top:0;left:0;right:0;height:5px;background:transparent;z-index:50}
+  .top .fill{height:100%;width:0;background:linear-gradient(90deg,var(--cloud),var(--electric))}
+
+  header.nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:.7rem;padding:1rem 6vw;
+    background:rgba(234,245,254,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:40}
+  header.nav img{height:30px}
+  header.nav .div{width:1px;height:22px;background:var(--line)}
+  header.nav span{font-size:.9rem;font-weight:700;color:var(--muted)}
+
+  section{padding:8vh 6vw;max-width:1100px;margin:0 auto}
+  .reveal{opacity:0;transform:translateY(28px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  .kicker{font-size:.95rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--electric);margin-bottom:1rem}
+  h1{font-size:clamp(2.4rem,6vw,4.4rem);line-height:1.03;color:var(--ink);font-weight:800;letter-spacing:-.02em}
+  h2{font-size:clamp(1.8rem,3.6vw,2.8rem);line-height:1.1;color:var(--ink);font-weight:800;margin-bottom:1.2rem}
+  .lead{font-size:clamp(1.15rem,2vw,1.5rem);line-height:1.55;color:var(--body);max-width:60ch;margin-top:1.2rem}
+  .sub{font-size:1.1rem;color:var(--muted);margin-top:1.2rem;max-width:60ch}
+
+  /* hero */
+  .hero{min-height:92vh;display:flex;flex-direction:column;justify-content:center;max-width:none;
+    background:linear-gradient(135deg,var(--navy) 0%,var(--electric-deep) 62%,var(--electric) 135%);color:#fff;
+    padding:12vh 6vw 8vh;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-8vw;bottom:-10vh;width:44vw;height:44vw;
+    background:radial-gradient(circle at 30% 30%,rgba(4,225,203,.25),rgba(4,225,203,0) 70%)}
+  .hero .kicker{color:var(--cloud)}
+  .hero h1{color:#fff;max-width:18ch}
+  .hero .lead{color:#D8EEFC;max-width:56ch}
+  .byline{margin-top:2.2rem}
+  .byline b{display:block;font-size:1.4rem;font-weight:800;color:#fff}
+  .byline span{display:block;font-size:1.05rem;color:#B9D4EF;margin-top:.2rem}
+  .badge{display:inline-block;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.4);
+    border-radius:999px;padding:.4rem 1.1rem;font-size:.9rem;font-weight:700;margin-top:2rem;width:fit-content}
+  .badge.warn{background:rgba(254,147,57,.14);color:#B8590A;border-color:var(--accent-warn)}
+
+  /* dark bands break up the scroll like the deck's statement slides */
+  .band{background:linear-gradient(135deg,var(--navy),var(--electric-deep));color:#fff;max-width:none;padding:12vh 6vw}
+  .band .inner{max-width:1100px;margin:0 auto}
+  .band .kicker{color:var(--cloud)}.band h2{color:#fff}.band .lead{color:#D8EEFC}
+
+  .grid{display:grid;gap:1.4rem;margin-top:2rem}
+  .g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.6rem 1.7rem;box-shadow:var(--shadow)}
+  .card h3{color:var(--ink);font-size:1.25rem;margin-bottom:.5rem;font-weight:800}
+  .card p{font-size:1.02rem;color:var(--body)}
+  .card .num{font-size:.9rem;font-weight:800;color:var(--electric);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+  .card.warn{border-top:5px solid var(--accent-warn)}.card.red{border-top:5px solid var(--accent-red)}
+  .card.blue{border-top:5px solid var(--electric)}.card.teal{border-top:5px solid var(--accent-teal)}
+  /* Take Action: the three questions as a wide, ready-to-run script */
+  .qscript{margin-top:1.5rem;background:rgba(4,225,203,.14);border:1px solid var(--accent-teal);border-radius:18px;padding:1.5rem 1.8rem}
+  .qscript .lbl{font-size:.85rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-teal);margin-bottom:1rem}
+  .qscript ol{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;counter-reset:q}
+  .qscript li{counter-increment:q;position:relative;padding-left:2.6rem;font-size:1.12rem;line-height:1.45;color:#EAFBF8;font-weight:600}
+  .qscript li::before{content:counter(q);position:absolute;left:0;top:-.1rem;width:1.8rem;height:1.8rem;border-radius:50%;background:var(--accent-teal);color:var(--navy);font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center}
+  .action-support{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.5rem}
+  @media (max-width:820px){.qscript ol,.action-support{grid-template-columns:1fr}}
+
+  ul.clean{list-style:none;margin-top:1.2rem}
+  ul.clean li{font-size:1.15rem;line-height:1.6;padding-left:1.8rem;position:relative;margin-bottom:.5rem;color:var(--body)}
+  ul.clean li::before{content:"";position:absolute;left:0;top:.55em;width:.7rem;height:.7rem;border-radius:50%;
+    background:linear-gradient(135deg,var(--cloud),var(--electric))}
+  .band ul.clean li{color:#EAF5FE}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:1.5rem;align-items:start}
+
+  .quote{font-size:clamp(1.5rem,3vw,2.1rem);line-height:1.4;color:#fff;font-weight:600;max-width:32ch;
+    border-left:6px solid var(--accent-teal);padding-left:1.6rem}
+  .quote cite{display:block;font-size:1.05rem;color:#B9D4EF;font-weight:500;font-style:normal;margin-top:1rem}
+
+  .statbar{display:flex;gap:2.6rem;flex-wrap:wrap;margin-top:1.6rem}
+  .stat b{display:block;font-size:2.6rem;color:var(--electric);font-weight:800;line-height:1}
+  .stat span{font-size:1rem;color:var(--muted)}
+  .card.red .stat b{color:var(--accent-red)}
+
+  .cite{font-size:.8rem;color:var(--muted);vertical-align:super}
+  .band .cite{color:#9FC1E6}
+
+  .moment .card{padding:2rem 1.9rem}
+  .moment .big{font-size:3rem;font-weight:800;line-height:1;color:var(--electric);margin:.6rem 0 .5rem}
+  .moment .card.warn .big{color:var(--accent-warn)}
+  .moment .card.teal .big{color:#0B7A6B}
+  .moment .card p:not(.big){font-size:1rem;color:var(--muted)}
+
+  .win{display:flex;align-items:flex-start;gap:.9rem;margin-top:1.8rem;padding:1.1rem 1.4rem;border-radius:14px;
+    background:linear-gradient(120deg,rgba(4,225,203,.16),rgba(6,106,254,.1));border:1px solid var(--accent-teal)}
+  .win .tag{flex:0 0 auto;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0B7A6B;
+    background:#fff;border:1px solid var(--accent-teal);border-radius:999px;padding:.35rem .8rem;margin-top:.1rem}
+  .win p{font-size:1.08rem;line-height:1.45;color:var(--ink);font-weight:600}
+  .band .win{background:rgba(4,225,203,.16);border-color:var(--accent-teal)}.band .win p{color:#EAFBF8}
+
+  .patterns{counter-reset:p}
+  footer.src{background:#fff;border-top:1px solid var(--line);max-width:none;padding:6vh 6vw}
+  footer.src .inner{max-width:1100px;margin:0 auto}
+  footer.src .cols{columns:2;column-gap:3rem;font-size:.92rem;line-height:1.5;color:var(--body);margin-top:1rem}
+  footer.src p{margin-bottom:.6rem;break-inside:avoid}
+  .end{text-align:center;color:var(--muted);font-size:.85rem;padding:3vh 0 6vh}
+
+  @media (max-width:820px){.g3,.g2,.two-col{grid-template-columns:1fr}footer.src .cols{columns:1}}
+</style>
+</head>
+<body>
+<div class="ibanner">Salesforce Internal — Do Not Distribute</div>
+<div class="top"><div class="fill" id="fill"></div></div>
+<header class="nav"><img src="assets/salesforce-logo.svg" alt="Salesforce"><div class="div"></div><span>ServiceNow vs. Salesforce ITSM · Competitive Analysis</span></header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="kicker reveal">ServiceNow vs. Salesforce ITSM · Competitive Analysis</div>
+  <h1 class="reveal">The Federal Deployment Gap.</h1>
+  <p class="lead reveal">Where ServiceNow falls short in federal civilian ITSM, why that gap is structural, and how your teams win with Agentforce IT Service.</p>
+  <div class="byline reveal"><b>Michael Weiner</b><span>Account Executive · Federal Civilian</span></div>
+</section>
+
+<!-- MOMENT -->
+<section>
+  <div class="kicker reveal">The Moment — Why Now</div>
+  <h2 class="reveal">Two shifts are forcing a ServiceNow re-evaluation right now.</h2>
+  <div class="grid g2 moment">
+    <div class="card warn reveal"><div class="num">01 · Forced Pricing</div><h3>Legacy SKUs going away</h3><p class="big">Jul 2026</p><p>ServiceNow ends its legacy pricing and it "cannot be reinstated," so every renewal becomes an up-tier decision.<span class="cite">[5]</span></p></div>
+    <div class="card teal reveal"><div class="num">02 · Mandate</div><h3>Consolidate &amp; prove AI</h3><p class="big">Now</p><p>Agencies are directed to consolidate platforms and show measurable AI value.</p></div>
+  </div>
+  <p class="sub reveal">Renewals and forced upgrades land in the next <b>6&ndash;18 months</b>, which is the window to re-evaluate.</p>
+</section>
+
+<!-- COMMON THREAD -->
+<section>
+  <div class="kicker reveal">The Common Thread</div>
+  <h2 class="reveal">ServiceNow sells the vision. In federal, it breaks down when it's time to actually go live.</h2>
+  <p class="lead reveal">The distance between what's on the order form and what's actually running shows up in four predictable places.</p>
+  <div class="grid g2">
+    <div class="card red reveal"><div class="num">Pattern 1</div><h3>A fractured AI front door</h3></div>
+    <div class="card red reveal"><div class="num">Pattern 2</div><h3>"Out-of-the-box" agents that aren't</h3></div>
+    <div class="card red reveal"><div class="num">Pattern 3</div><h3>ITOM bought, never deployed</h3></div>
+    <div class="card red reveal"><div class="num">Pattern 4</div><h3>Upgrades &amp; rising cost</h3></div>
+  </div>
+</section>
+
+<!-- FRONT DOOR -->
+<section>
+  <div class="kicker reveal">Problem 1 — The AI Front Door</div>
+  <h2 class="reveal">The employee AI front door is split in two, and the security levels don't match.</h2>
+  <div class="two-col">
+    <div class="reveal"><ul class="clean">
+      <li>ServiceNow bought MoveWorks for <b>$2.85B</b> (2025) to be the AI chat front door for employees.<span class="cite">[2]</span></li>
+      <li>Its new bundle, <b>"Employee Works"</b> (MoveWorks + Employee Service Center), forces a choice: buy MoveWorks now, or wait for an integration plan that <b>does not exist</b>.</li>
+      <li>An independent analyst noted MoveWorks is built for general commercial use and <b>lacks models for regulated sectors like government</b>.<span class="cite">[2]</span></li>
+    </ul></div>
+    <div class="card red reveal">
+      <div class="num">The FedRAMP gap</div>
+      <div class="statbar">
+        <div class="stat"><b>MODERATE</b><span>MoveWorks GovCloud FedRAMP &mdash; only since Feb 2026 <span class="cite">[3]</span></span></div>
+        <div class="stat"><b style="color:#0B7A3B">HIGH</b><span>ServiceNow core platform (GCC) FedRAMP <span class="cite">[4]</span></span></div>
+      </div>
+      <p style="margin-top:1.2rem">An agency that requires the High security level cannot run MoveWorks at that level without compromising its setup.</p>
+    </div>
+  </div>
+  <div class="win reveal"><span class="tag">Salesforce advantage</span><p>Employees use the tool they already have &mdash; Slack or Microsoft Teams &mdash; plus an included self-service portal with an AI chatbot, all at the FedRAMP High level on Government Cloud Plus. No product to choose between, and no security-level gap.<span class="cite">[4][8]</span></p></div>
+</section>
+
+<!-- AGENTS -->
+<section>
+  <div class="kicker reveal">Problem 2 — "Out-of-the-Box" Agents</div>
+  <h2 class="reveal">Their "out-of-the-box" agents don't actually work out of the box.</h2>
+  <div class="two-col">
+    <div class="reveal"><ul class="clean">
+      <li>Not usable as delivered &mdash; heavy setup is required before anything runs.</li>
+      <li>Need constant hands-on help from ServiceNow or a partner.</li>
+      <li>Wrapped in <b>proprietary system prompts and code</b> that prove ineffective: teams spend heavy time rewriting the agent instructions, and <b>results come back wildly inconsistent from one run to the next</b>.</li>
+      <li>The "out-of-the-box agent" turns into another multi-month, services-heavy project &mdash; the same story as ITOM.</li>
+    </ul></div>
+    <div>
+      <div class="card red reveal">
+        <div class="num">Question to ask</div>
+        <p style="font-size:1.15rem;line-height:1.5;color:var(--ink);font-weight:600">Of the out-of-the-box agents you purchased, how many are actually live in production today without paying for a services project to set them up?</p>
+      </div>
+      <div class="card blue reveal" style="margin-top:1.2rem"><h3>Salesforce approach</h3><p>Agents built on the customer's own data, running where employees already work, instead of coded to order in each environment.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ITOM -->
+<section>
+  <div class="kicker reveal">Problem 3 — ITOM</div>
+  <h2 class="reveal">ITOM is expensive to buy and very hard to deploy.</h2>
+  <div class="two-col">
+    <div class="reveal">
+      <p class="lead" style="margin-top:0">Across federal and DoD, only a handful of customers ever get ITOM set up correctly. Plenty buy it. A few start. Almost none finish &mdash; it takes a large budget and hard-to-find expertise.</p>
+      <div class="card reveal" style="margin-top:1.4rem"><p>ServiceNow's own community is full of teams asking how to run Discovery across hundreds of thousands of assets; specialists report most Discovery projects stall.<span class="cite">[1]</span></p></div>
+    </div>
+    <div>
+      <div class="card teal reveal"><div class="num">The Salesforce advantage</div><h3>The CMDB comes with the platform, not a separate ITOM project</h3><p>CMDB, Discovery and the Service Graph are part of Agentforce IT Service, so there's no separate ITOM product to license just to get a working CMDB.<span class="cite">[12]</span></p></div>
+      <div class="card reveal" style="margin-top:1.2rem"><h3>Question to ask</h3><p>Is the ITOM they bought actually deployed, and can they produce a current CMDB report today?</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COST -->
+<section>
+  <div class="kicker reveal">Problem 4 — Upgrades &amp; Cost</div>
+  <h2 class="reveal">Renewal costs climb through forced upgrades and pricing that's hard to predict.</h2>
+  <div class="grid g2">
+    <div class="card warn reveal"><h3>Upgrades are a project, not a switch</h3><p>Self-managed, regression-tested. Most federal customers take only <b>one</b> of two yearly releases, so they stay <b>~6 months behind</b>.<span class="cite">[5]</span></p></div>
+    <div class="card warn reveal"><h3>Pay-as-you-go "assists"</h3><p>Now Assist bills by usage: <b>unpredictable, escalating costs</b>. Usage grew <b>9x</b> in H1 2025.<span class="cite">[6]</span></p></div>
+  </div>
+  <div class="win reveal"><span class="tag">Salesforce advantage</span><p>Automatic seasonal releases, no upgrade project, and predictable per-user pricing.<span class="cite">[12][16]</span></p></div>
+</section>
+
+<!-- PROOF -->
+<section class="band">
+  <div class="inner">
+    <div class="kicker reveal">The Proof — A Federal Example</div>
+    <div class="quote reveal">"After more than a year implementing ServiceNow, we still couldn't get a basic report of how many tickets were coming in."
+      <cite>&mdash; George Forbes, CIO, Bureau of Industry &amp; Security</cite></div>
+    <p class="lead reveal">The gap between what was purchased and what was deployed, stated by a sitting federal CIO, and the same pattern repeats across agencies facing a forced upgrade.</p>
+  </div>
+</section>
+
+<!-- ANSWER -->
+<section>
+  <div class="kicker reveal">The Salesforce Answer</div>
+  <h2 class="reveal">Agentforce IT Service: one platform, and a front door employees already use.</h2>
+  <div class="grid g3">
+    <div class="card blue reveal"><h3>Works where employees already are</h3><p>Slack or Microsoft Teams, plus an included self-service portal with an AI chatbot &mdash; not a separate add-on.<span class="cite">[8]</span></p></div>
+    <div class="card blue reveal"><h3>AI-first and all in one place</h3><p>Incident, problem, change, CMDB <em>and</em> the employee experience share one set of data.<span class="cite">[8]</span></p></div>
+    <div class="card blue reveal"><h3>Built on a platform they already own</h3><p>Runs on the Salesforce platform the agency already uses, so IT service extends their footprint rather than adding a new vendor.<span class="cite">[8]</span></p></div>
+  </div>
+</section>
+
+<!-- CMDB COST ADVANTAGE -->
+<section>
+  <div class="kicker reveal">The Cost Advantage — CMDB</div>
+  <h2 class="reveal">In ServiceNow the CMDB needs a separate ITOM product. In Salesforce it comes with the platform.</h2>
+  <div class="two-col">
+    <div class="card red reveal">
+      <div class="num">ServiceNow</div>
+      <h3>A working CMDB means licensing ITOM on top of ITSM</h3>
+      <p>The CMDB structure ships with the platform, but keeping it current takes <b>Discovery / Service Graph</b> &mdash; a separate ITOM product, metered per discovered infrastructure item and widely reported as expensive to own over time.<span class="cite">[13][14]</span></p>
+    </div>
+    <div class="card teal reveal">
+      <div class="num">Salesforce</div>
+      <h3>CMDB, Discovery &amp; Service Graph come with the platform</h3>
+      <p>They're part of Agentforce IT Service, not a separately-licensed ITOM add-on. Only discovered infrastructure items are metered.<span class="cite">[15]</span></p>
+    </div>
+  </div>
+  <div class="win reveal"><span class="tag">Salesforce advantage</span><p>Federal buyers price the whole path to a working CMDB. With ServiceNow that's ITSM plus a separate ITOM project; with Salesforce the CMDB and Service Graph are already in the subscription.<span class="cite">[15]</span></p></div>
+</section>
+
+<!-- MOTIONS -->
+<section>
+  <div class="kicker reveal">Two Ways to Win the Account</div>
+  <div class="two-col">
+    <div class="card reveal"><div class="num">Play 1</div><h3>Replace ServiceNow</h3><p>Aim at accounts on ServiceNow's basic tiers, or with less mature IT, that are being hit by the forced upgrade. The upcoming renewal and the price increase are the opening.<span class="cite">[10]</span></p></div>
+    <div class="card reveal"><div class="num">Play 2</div><h3>Start alongside, then grow</h3><p>For established ServiceNow accounts: add Salesforce IT Service agents next to it, review what their Now Assist AI is actually returning, and lead with the Slack or Microsoft Teams experience they already use. Account by account.<span class="cite">[10]</span></p></div>
+  </div>
+  <p class="sub reveal"><b>How to position:</b> lead with bringing systems together and using AI across the customer's own data, rather than comparing ITSM features one by one.<span class="cite">[10]</span></p>
+</section>
+
+<!-- ACTION -->
+<section class="band">
+  <div class="inner">
+    <div class="kicker reveal">Take Action This Quarter</div>
+    <div class="qscript reveal">
+      <div class="lbl">The three questions to ask every ServiceNow account</div>
+      <ol>
+        <li>Is your ITOM actually deployed, and can you pull a current CMDB report today?</li>
+        <li>For your AI front door, did you land on MoveWorks or Employee Service Center, and does it meet your required security level?</li>
+        <li>Of the out-of-the-box agents you bought, how many are live in production without paying for a setup project?</li>
+      </ol>
+    </div>
+    <div class="action-support reveal">
+      <div class="card"><div class="num">Before the call</div><h3>Pull the list</h3><p>Use the <b>GPS AMER ServiceNow Compete Prospect List</b> (flags ServiceNow install-base and open pipe) plus an Org62 report of your accounts. Put anyone with a renewal or forced upgrade inside 18 months at the top.<span class="cite">[10]</span></p></div>
+      <div class="card"><div class="num">After the call</div><h3>Offer the data-driven proof</h3><p>We can ingest a customer's ServiceNow data and show where routing and automation improve. Loop in the ITSM specialist team to scope it.<span class="cite">[15]</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- REMEMBER -->
+<section>
+  <div class="kicker reveal">Three Things to Remember</div>
+  <ul class="clean" style="font-size:1.35rem">
+    <li class="reveal"><b>ServiceNow's AI story is split and confusing</b> &mdash; two overlapping front doors, a new MoveWorks stuck at the Moderate security level, and pricing that's hard to predict.<span class="cite">[10]</span></li>
+    <li class="reveal"><b>Lead with bringing systems together and using AI on the customer's own data</b>, not a feature checklist.<span class="cite">[10]</span></li>
+    <li class="reveal"><b>The window is the next 6&ndash;18 months</b>, as renewals and forced upgrades land.</li>
+  </ul>
+</section>
+
+<!-- SOURCES -->
+<footer class="src">
+  <div class="inner">
+    <div class="kicker">Sources</div>
+    <div class="cols">
+      <p>[1] ServiceNow Community, ITOM/Discovery deployment threads; Einar &amp; Partners, "Succeeding with ServiceNow Discovery/ITOM," 2021.</p>
+      <p>[2] ServiceNow to acquire MoveWorks (~$2.85B), 2025-03-10 (ServiceNow newsroom; TechCrunch). Integration/fed-fit analysis: Everest Group, 2025-03-12.</p>
+      <p>[3] "MoveWorks from ServiceNow achieves FedRAMP Moderate," Business Wire, 2026-02-25.</p>
+      <p>[4] FedRAMP Marketplace (fedramp.gov/marketplace), retrieved 2026-09-23: ServiceNow GCC = High; MoveWorks GovCloud = Moderate; Salesforce Gov Cloud Plus = High.</p>
+      <p>[5] "ServiceNow Pricing Changes 2026," Crossfuze, updated 2026-05-08.</p>
+      <p>[6] "Now Assist consumption-based licensing," UpperEdge, 2025-09-11 (9x usage growth per ServiceNow Q2 2025 earnings).</p>
+      <p>[7] Federal civilian contract spend &minus;11% YoY; FY26 outline &minus;23% civilian discretionary &mdash; Nextgov/FCW, 2025-09-10.</p>
+      <p>[8] "Introducing Agentforce IT Service," Salesforce, 2025-09 (Dreamforce); SalesforceBen, 2025-09-08.</p>
+      <p>[9] "Agentforce IT Service selected by 180+ organizations," Salesforce, 2026-02-26.</p>
+      <p>[10] Internal: "September 3rd FedCiv Power Play #ITSM" deck (Salesforce ITSM specialist insights).</p>
+      <p>[11] ServiceNow Q1/Q2 2025 earnings, 30%+ US public sector growth, "un-DOGE-ed" (Constellation Research; CNBC 2025-07-23) &mdash; counter-point context.</p>
+      <p>[12] Salesforce, "IT Service Management" product page (salesforce.com/service/it-service-management) &mdash; IT Service Desk Enterprise $75/user/mo incl. "CMDB, Discovery, and Service Graph for end-user devices," retrieved 2026-09.</p>
+      <p>[13] ServiceNow Product Docs, "Configuration Management Database (CMDB)" (Zurich) &mdash; CMDB population via Discovery / Service Graph Connectors (separately packaged apps).</p>
+      <p>[14] PeerSpot, "ServiceNow Discovery Pricing" (aggregated user reviews) &mdash; per-node/subscription-unit licensing, high TCO; UpperEdge (2025-2026) on tiered packaging &amp; escalating cost.</p>
+      <p>[15] Salesforce ITSM specialist briefing, 2026-09-24: FedRAMP High status of core ITSM/agents/Discovery/CMDB in GovCloud; IL5 passed (cert pending); GRC &amp; HAM not yet certified; CMDB/Discovery/Service Graph included in the platform (no separate ITOM license), infrastructure CIs metered; ServiceNow-data ingest proof program.</p>
+      <p>[16] Salesforce release model &mdash; three managed seasonal releases per year (Spring/Summer/Winter) delivered automatically with backward compatibility (help.salesforce.com, "Salesforce Release Schedule"). ServiceNow upgrades are customer-scheduled and require regression testing of customizations before promotion (ServiceNow Docs, "Upgrade and migration").</p>
+    </div>
+  </div>
+</footer>
+<div class="end">Salesforce Federal Civilian · Competitive Analysis · Sept 2026 · Internal use</div>
+
+<script>
+  const fill=document.getElementById('fill');
+  const onScroll=()=>{const h=document.documentElement;const p=h.scrollTop/(h.scrollHeight-h.clientHeight);fill.style.width=(p*100)+'%'};
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
