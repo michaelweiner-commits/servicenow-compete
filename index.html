@@ -121,6 +121,18 @@
   .band .win{background:rgba(4,225,203,.16);border-color:var(--accent-teal)}.band .win p{color:#EAFBF8}
 
   .patterns{counter-reset:p}
+
+  /* Scorecard: 1:1 problem -> answer mapping on the closing section */
+  .scorecard{width:100%;border-collapse:separate;border-spacing:0 .7rem;margin-top:1.4rem}
+  .scorecard th{text-align:left;font-size:.9rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:0 1.3rem .4rem}
+  .scorecard thead th:first-child{color:var(--accent-red)}
+  .scorecard thead th:last-child{color:#0B7A6B}
+  .scorecard td{vertical-align:top;padding:1rem 1.3rem;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+  .scorecard td:first-child{border-left:4px solid var(--accent-red);border-radius:12px 0 0 12px}
+  .scorecard td:last-child{border-left:4px solid var(--accent-teal);border-radius:0 12px 12px 0}
+  .scorecard td b{display:block;font-size:1.12rem;color:var(--ink);font-weight:800;margin-bottom:.25rem}
+  .scorecard td span{display:block;font-size:.95rem;line-height:1.4;color:var(--body)}
+  @media (max-width:820px){.scorecard,.scorecard thead,.scorecard tbody,.scorecard tr,.scorecard td,.scorecard th{display:block;width:100%}.scorecard td:first-child,.scorecard td:last-child{border-radius:12px;margin-bottom:.5rem}}
   footer.src{background:#fff;border-top:1px solid var(--line);max-width:none;padding:6vh 6vw}
   footer.src .inner{max-width:1100px;margin:0 auto}
   footer.src .cols{columns:2;column-gap:3rem;font-size:.92rem;line-height:1.5;color:var(--body);margin-top:1rem}
@@ -211,7 +223,7 @@
 
 <!-- ITSM vs ITOM EXPLAINER -->
 <section>
-  <div class="kicker reveal">ITSM vs. ITOM</div>
+  <div class="kicker reveal">Foundation — ITSM vs. ITOM (not a problem, a definition)</div>
   <h2 class="reveal">It takes two ServiceNow products to run IT. We do it in one.</h2>
   <div class="arch reveal">
     <div class="arch-col snow">
@@ -251,7 +263,7 @@
   <div class="kicker reveal">Problem 4 — Upgrades &amp; Cost</div>
   <h2 class="reveal">Every upgrade is a project.</h2>
   <div class="grid">
-    <div class="card warn reveal"><h3>Self-managed and regression-tested</h3><p>The customer runs and validates every upgrade. Most federal customers take only <b>one</b> of the two yearly releases, so they stay perpetually <b>~6 months behind</b> on features they've already paid for.<span class="cite">[5]</span></p></div>
+    <div class="card warn reveal"><h3>Self-managed and regression-tested</h3><p>The customer runs and validates every upgrade, re-testing every customization and integration because functionality can break in the process. Most federal customers take only <b>one</b> of the two yearly releases, so they stay perpetually <b>~6 months behind</b> on features they've already paid for.<span class="cite">[5][15]</span></p></div>
   </div>
   <div class="win reveal"><span class="tag">Salesforce advantage</span><p>Automatic seasonal releases, no upgrade project, and predictable per-user pricing.<span class="cite">[11][15]</span></p></div>
 </section>
@@ -306,14 +318,34 @@
   <p class="sub reveal"><b>What tends to land:</b> bringing systems together and using AI on the customer's own data, rather than comparing ITSM features one by one.<span class="cite">[9]</span></p>
 </section>
 
-<!-- REMEMBER -->
+<!-- THE SCORECARD: PROBLEM -> ANSWER 1:1 -->
 <section>
-  <div class="kicker reveal">Three Things to Remember</div>
-  <ul class="clean" style="font-size:1.35rem">
-    <li class="reveal"><b>ServiceNow's AI story is split and confusing</b> &mdash; two overlapping front doors, a new MoveWorks stuck at the Moderate security level, and pricing that's hard to predict.<span class="cite">[9]</span></li>
-    <li class="reveal"><b>Lead with bringing systems together and using AI on the customer's own data</b>, not a feature checklist.<span class="cite">[9]</span></li>
-    <li class="reveal"><b>The window is the next 6&ndash;18 months</b>, as renewals and forced upgrades land.</li>
-  </ul>
+  <div class="kicker reveal">The Scorecard — Their Problem, Our Answer</div>
+  <h2 class="reveal">Four gaps. Four answers. One platform.</h2>
+  <table class="scorecard reveal">
+    <thead>
+      <tr><th>ServiceNow problem</th><th>The Salesforce answer</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>1. A fractured AI front door</b><span>Two overlapping doors; MoveWorks stuck at FedRAMP Moderate.</span></td>
+        <td><b>One front door they already use</b><span>Slack or Teams plus an included self-service portal, all at FedRAMP High &mdash; no product to pick, no security-level gap.</span></td>
+      </tr>
+      <tr>
+        <td><b>2. "Out-of-the-box" agents that aren't</b><span>Coded to order, services-heavy, inconsistent run to run.</span></td>
+        <td><b>Agents on the customer's own data</b><span>Built on their data, running where employees already work, not re-coded for each environment.</span></td>
+      </tr>
+      <tr>
+        <td><b>3. ITOM bought, never deployed</b><span>A separate product; a working CMDB rarely gets finished.</span></td>
+        <td><b>CMDB included in the platform</b><span>CMDB, Discovery and Service Graph come with Agentforce IT Service &mdash; no separate ITOM project to license.</span></td>
+      </tr>
+      <tr>
+        <td><b>4. Upgrades &amp; rising cost</b><span>Self-managed upgrades that can break; forced up-tier pricing.</span></td>
+        <td><b>Automatic seasonal releases</b><span>No upgrade project, backward compatible, with predictable per-user pricing.</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="sub reveal"><b>The window is the next 6&ndash;18 months</b>, as renewals and forced upgrades land. Lead with consolidation and AI on their own data, not a feature checklist.<span class="cite">[9]</span></p>
 </section>
 
 <!-- SOURCES -->
