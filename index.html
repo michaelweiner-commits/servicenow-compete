@@ -65,6 +65,21 @@
   .card .num{font-size:.9rem;font-weight:800;color:var(--electric);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
   .card.warn{border-top:5px solid var(--accent-warn)}.card.red{border-top:5px solid var(--accent-red)}
   .card.blue{border-top:5px solid var(--electric)}.card.teal{border-top:5px solid var(--accent-teal)}
+  /* ITSM vs ITOM architecture explainer: two products vs one */
+  .arch{display:grid;grid-template-columns:1fr auto 1fr;gap:2.2rem;align-items:start;margin-top:2rem}
+  .arch-vs,.arch-col.sf{align-self:center}
+  .arch-label{font-size:1rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.9rem}
+  .arch-col.sf .arch-label{color:#0B7A6B}
+  .arch-box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.5rem;box-shadow:var(--shadow)}
+  .arch-box b{display:block;font-size:1.3rem;color:var(--ink);font-weight:800;margin-bottom:.35rem}
+  .arch-box span{font-size:1rem;color:var(--body);line-height:1.45}
+  .arch-col.snow .arch-box{border-left:5px solid var(--muted)}
+  .arch-plus{text-align:center;font-size:1.7rem;font-weight:800;color:var(--muted);margin:.55rem 0}
+  .arch-col.sf .arch-box{border:2px solid var(--accent-teal);background:rgba(4,225,203,.06)}
+  .arch-vs{font-size:1.2rem;font-weight:800;color:var(--muted);text-transform:uppercase;text-align:center}
+  .arch-foot{margin-top:1rem;font-size:1rem;font-weight:700}
+  .arch-col.snow .arch-foot{color:var(--accent-red)}.arch-col.sf .arch-foot{color:#0B7A6B}
+  @media (max-width:820px){.arch{grid-template-columns:1fr}}
 
   ul.clean{list-style:none;margin-top:1.2rem}
   ul.clean li{font-size:1.15rem;line-height:1.6;padding-left:1.8rem;position:relative;margin-bottom:.5rem;color:var(--body)}
@@ -190,6 +205,27 @@
         <p style="font-size:1.15rem;line-height:1.5;color:var(--ink);font-weight:600">Of the out-of-the-box agents you purchased, how many are actually live in production today without paying for a services project to set them up?</p>
       </div>
       <div class="card blue reveal" style="margin-top:1.2rem"><h3>Salesforce approach</h3><p>Agents built on the customer's own data, running where employees already work, instead of coded to order in each environment.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ITSM vs ITOM EXPLAINER -->
+<section>
+  <div class="kicker reveal">ITSM vs. ITOM &mdash; First, What They Are</div>
+  <h2 class="reveal">It takes two ServiceNow products to run IT. We do it in one.</h2>
+  <div class="arch reveal">
+    <div class="arch-col snow">
+      <div class="arch-label">ServiceNow</div>
+      <div class="arch-box"><b>ITSM</b><span>The service desk: tickets, requests, incidents. What most people picture.</span></div>
+      <div class="arch-plus">+</div>
+      <div class="arch-box"><b>ITOM</b><span>Operations: discovers your servers, routers and assets and keeps the CMDB current. A separate product, separately licensed.</span></div>
+      <div class="arch-foot">Two products to license and deploy</div>
+    </div>
+    <div class="arch-vs">vs.</div>
+    <div class="arch-col sf">
+      <div class="arch-label">Salesforce</div>
+      <div class="arch-box"><b>Agentforce IT Service</b><span>ITSM plus the CMDB, Discovery and Service Graph &mdash; all in one platform, on the customer's own data.</span></div>
+      <div class="arch-foot">One platform, CMDB included</div>
     </div>
   </div>
 </section>
